@@ -1,32 +1,39 @@
 # IP Logger Discord Bot
 
-A full IP logger with Discord bot integration.
+Auto IP grabber + campaign tracking + optional GPS page.  
+Posts hits to a Discord channel via webhook or bot.
 
-## Setup
+## Quick Deploy (Render)
 
-### 1. Discord Bot
-1. Go to https://discord.com/developers/applications
-2. Create new application → Bot → Create Bot
-3. Copy the token → Enable all Privileged Gateway Intents
-4. Invite bot with `bot` + `applications.commands` scopes
+1. Fork/clone this repo to your GitHub  
+2. Go to https://render.com → New Web Service → connect repo  
+3. Build: `pip install -r requirements.txt`  
+4. Start: use Procfile  
+5. Add environment variables (see below)  
+6. Deploy  
 
-### 2. Get Channel ID
-- Enable Developer Mode in Discord (Settings → Advanced)
-- Right-click your channel → Copy ID
+## Environment Variables
 
-### 3. Deploy to Render
-1. Push this repo to GitHub
-2. Go to https://render.com → New Web Service
-3. Connect your GitHub repo
-4. Set:
-   - Build Command: `pip install -r requirements.txt`
-   - Start Command: `python app.py`
-5. Add Environment Variables:
-   - `DISCORD_BOT_TOKEN` = your bot token
-   - `DISCORD_CHANNEL_ID` = your channel ID
-   - `REDIRECT_URL` = where victims get sent (optional)
-   - `IPINFO_TOKEN` = your ipinfo.io token (optional)
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DISCORD_BOT_TOKEN` | No* | Bot token for slash commands + channel posting |
+| `DISCORD_CHANNEL_ID` | No* | Channel ID for bot to post in |
+| `DISCORD_WEBHOOK_URL` | No* | Webhook URL (fallback if bot not used) |
+| `REDIRECT_URL` | No | Where visitors land (default: Google) |
+| `IPINFO_TOKEN` | No | ipinfo.io token for better GeoIP |
+| `BASE_URL` | No | Your app's public URL (for /genlink) |
 
-### Commands
-- `/status` — Check bot status
-- `/setredirect <url>` — Change redirect URL on the fly
+*\*Either BOT_TOKEN+CHANNEL_ID or WEBHOOK_URL must be set.*
+
+## URLs
+
+- `/` → auto IP grab + redirect  
+- `/r/<campaign>` → campaign-tracked redirect  
+- `/g` → GPS decoy page (browser asks Allow/Block)  
+- `/ping` → health check  
+
+## Bot Commands
+
+- `/status` — bot stats, hit count, ping  
+- `/setredirect <url>` — change default redirect  
+- `/genlink campaign:<name>` — generate tracked `/r/<name>` link
