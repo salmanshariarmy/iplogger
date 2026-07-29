@@ -336,7 +336,7 @@ async def cmd_genlink(interaction: discord.Interaction, campaign: str):
     embed.add_field(name="Link", value=link, inline=False)
     embed.add_field(name="Redirects to", value=REDIRECT_URL, inline=False)
     await interaction.response.send_message(embed=embed)
-
+ @tree.command /gpslink
 def run_discord_bot():
     """Run the bot with its own asyncio loop (blocking)."""
     loop = asyncio.new_event_loop()
